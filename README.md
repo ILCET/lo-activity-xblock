@@ -14,8 +14,7 @@ In edit mode, the xblock will get from CET servers the list of CET activities re
 EdX course. The instructor will be able to select one of them to run in the unit being
 designed. Author view will show the activity in preview (stateless) mode.
 ### Student View
-The student will meet the adaptive learning object. Unit level grades will be reported to EdX
-(not implemented yet).
+The student will meet the adaptive learning object. Unit level grades will be reported to EdX.
 In order to operate in adaptive mode, when the first student enters the activity, a task will be
 created using CET services. Then this task will be used for all the students of the same
 course in the activity.
