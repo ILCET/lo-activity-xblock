@@ -1,0 +1,83 @@
+﻿<!--Add the following HTML code to CET Insights page's RAW html-->
+<script src="https://login.cet.ac.il/Scripts/login.js"></script>
+<script src="//ebag.dev.cet.ac.il/CetSso.js"></script>
+<script>
+  var CET_DOMAIN = ".lab.cet.ac.il";
+  if (window.location.host.indexOf("localhost") >= 0 || window.location.host.indexOf("127.0.0.1") >= 0) {
+    CET_DOMAIN = ".dev.cet.ac.il"
+  }
+  var PRODUCT_PLAYER = "//productplayer" + CET_DOMAIN + "/";
+  var PRODUCT_PLAYER_SERVICES = "//productplayerservices" + CET_DOMAIN + "/";
+
+  function selectView() {
+    CetSso.getsession(function (user) {
+      if (user) {
+        if (user.userRole == "student") {
+          studentView();
+        }
+        else {
+          teacherView();
+        }
+      }
+      else {
+        // IDM SSO
+        CET.Authentication.LogMeIn('IDM');
+      }
+    });
+  }
+
+  this.getCourseEdxName = function () {
+    var match = /-v\d+:([^\/\+]+\+[^\/\+]+\+[^\/\+]+)[\/\+]/gi.exec(location.pathname);
+    if (match.length) {
+      return match[1];
+    }
+  }
+
+  function getCourseCetName(edxName) {
+    edxName = edxName || this.getCourseEdxName();
+    var url = PRODUCT_PLAYER + "edxCourses.json";
+    return $.Deferred(function (dfd) {
+      $.get(url).done(function (response) {
+        var courseObj = response[edxName];
+        if (courseObj) {
+          dfd.resolve(courseObj.path);
+        }
+        else {
+          dfd.reject("Cet course is not defined");
+        }
+      }).fail(function (response) {
+        dfd.reject("Failed to retrieve Cet course name. Error: " + response);
+      });
+    });
+  }
+
+  function setLink(courseCetName) {
+    var link = document.getElementById('cet-insights-link');
+    link.href = "//productplayer" + CET_DOMAIN + "/" + courseCetName;
+  }
+
+  function showView(viewname) {
+    var view = document.getElementById('cet-insights-' + viewname);
+    if (view)
+      view.style.display = '';
+  }
+
+  function teacherView() {
+    getCourseCetName().done(function(name) {
+      setLink(name);
+      showView('teacher')
+    });
+  }
+  function studentView() {
+    showView('student')
+  }
+
+  $(selectView);
+
+</script>
+<div id="cet-insights-teacher" style="display:none;text-align:center;direction:rtl;">
+  <a id="cet-insights-link" target="_blank">לצפייה במערכת הדוחות של  מטח, לחץ כאן.</a>
+</div>
+<div id="cet-insights-student" style="display:none;text-align:center;direction:rtl;">
+  לא ניתן לצפות במערכת הדוחות של מטח כרגע, יש  לפנות למורה.
+</div>
