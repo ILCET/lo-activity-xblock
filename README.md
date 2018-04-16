@@ -1,7 +1,7 @@
 # lo-activity-xblock
 ## Goal
 The xblock will embed CET Player platform into EdX. The CET player contains the ability to
-create personlized learning path for each student.
+create personalized learning path for each student.
 ## Method
 Activities in CET online courses have the ability of adaptive learning. Embedding them in edx
 course will enhance the edx LMS by the adaptive flow. The xblock will be embedded in the
