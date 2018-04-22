@@ -20,11 +20,16 @@ def package_data(pkg, roots):
 
     return {pkg: data}
 
+base_path = os.path.dirname(__file__)
+README = open(os.path.join(base_path, "README.md")).read()
 
 setup(
     name='cetloxblock-xblock',
-    version='1.0.0',
-    description='cetloxblock XBlock',   # TODO: write a better description.
+    version='1.0.1',
+    description='An XBlock that embeds the CET Player platform into Open edX. The CET player contains the ability to create personalized learning path for each student.',
+    long_description=README,
+    author="cetil",
+    url="https://github.com/ILCET/lo-activity-xblock",
     license='UNKNOWN',          # TODO: choose a license: 'AGPL v3' and 'Apache 2.0' are popular.
     packages=[
         'cetloxblock',
