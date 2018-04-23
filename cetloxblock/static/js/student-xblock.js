@@ -7,8 +7,8 @@ function CetLoXBlock(runtime, element) {
   var _this = this;
 
   function initializeServices() {
-    var cetdomain = $('.cet-domain', element).val();
-    _this.services = new CetServices(cetdomain);
+    _this.services = new CetServices();
+    var cetdomain = _this.services.CetDomain;
     _this.sso = new cetloAuthentication(cetdomain);
   }
 
@@ -47,8 +47,8 @@ function CetLoXBlock(runtime, element) {
 
   function initializePlayerVars() {
     _this.$playerFrame = $('.cet-lo-player', element);
-    _this.itemPlayerUrlTemplate = $('.cet-lo-item-template', element).val();
-    _this.taskPlayerUrlTemplate = $('.cet-lo-task-template', element).val();
+    _this.itemPlayerUrlTemplate = $('.cet-lo-item-template', element).val().replace("{cetdomain}", _this.services.CetDomain);
+    _this.taskPlayerUrlTemplate = $('.cet-lo-task-template', element).val().replace("{cetdomain}", _this.services.CetDomain);
   }
 
   function unloadPlayer() {
@@ -88,7 +88,11 @@ function CetLoXBlock(runtime, element) {
     _this.sso.authenticate().done(function (authenticated) {
       if (authenticated) {
         initializePlayerVars();
-        if (!getTaskId()) {
+        var taskId = getTaskId();
+        if (taskId) {
+          loadTaskPlayer(taskId);
+        }
+        else {
           if (_this.sso.isStudent()) {
             unloadPlayer();
             initializeTask(_this.sso.getUserInfo()).done(function (taskId) {

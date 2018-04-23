@@ -38,8 +38,7 @@ function CetLoXBlock(runtime, element) {
   }
 
   function initServices() {
-    var cetdomain = $('.cet-domain', element).val();
-    this.services = new CetServices(cetdomain);
+    this.services = new CetServices();
   }
 
   function renderList() {
@@ -99,7 +98,8 @@ function CetLoXBlock(runtime, element) {
     runtime.notify('save', {state: 'start'});
     $.post(handlerUrl, JSON.stringify(data)).done(function(response) {
       if (response.result === 'success') {
-        runtime.notify('save', {state: 'end'});
+        runtime.notify('save', { state: 'end' });
+        window.location.reload();
       }
     });	  
   });

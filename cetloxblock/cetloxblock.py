@@ -15,7 +15,6 @@ class CetLoXBlock(XBlock):
     The studio view enables the author to select the LO for the current xblock instance.
     """
 
-    CET_DOMAIN = u".lab.cet.ac.il"
     PROTOCOL = "https:"
     ITEM_URL_TEMPLATE = u"{protocol}//lo{cetdomain}/player/?document={documentid}&language={language}&sitekey=ebag#options=nobar"
     TASK_URL_TEMPLATE = u"{protocol}//lo{cetdomain}/player/xblockplayer.html?task={taskid}&sitekey=ebag"
@@ -57,13 +56,11 @@ class CetLoXBlock(XBlock):
             return Fragment(u"EMPTY student_view")
 
         iframe_src = u"about:blank"
-        if self.taskid:
-            iframe_src = self.get_task_url(self.taskid)
         
-        itemTemplate = self.ITEM_URL_TEMPLATE.format(protocol=self.PROTOCOL, cetdomain=self.CET_DOMAIN, language=self.language, documentid=u"{itemid}")
-        taskTemplate = self.TASK_URL_TEMPLATE.format(protocol=self.PROTOCOL, cetdomain=self.CET_DOMAIN, taskid=u"{taskid}")
+        itemTemplate = self.ITEM_URL_TEMPLATE.format(protocol=self.PROTOCOL, cetdomain=u"{cetdomain}", language=self.language, documentid=u"{itemid}")
+        taskTemplate = self.TASK_URL_TEMPLATE.format(protocol=self.PROTOCOL, cetdomain=u"{cetdomain}", taskid=u"{taskid}")
         html = self.resource_string("static/html/cetlo_student_view.html")
-        html = html.format(cetdomain=self.CET_DOMAIN, documentid=self.documentid, language=self.language, taskid=self.taskid, itemTemplate=itemTemplate, taskTemplate=taskTemplate, iframeSrc=iframe_src)
+        html = html.format(documentid=self.documentid, language=self.language, taskid=self.taskid, itemTemplate=itemTemplate, taskTemplate=taskTemplate, iframeSrc=iframe_src)
 
         frag = Fragment(html)
         frag.add_css(self.resource_string("static/css/cetloxblock_student.css"))
@@ -76,7 +73,7 @@ class CetLoXBlock(XBlock):
     def add_sso_scripts(self, fragment):
         """ add scripts required for sso with CET """
         fragment.add_javascript_url(u"{protocol}//login.cet.ac.il/Scripts/login.js".format(protocol=self.PROTOCOL))
-        fragment.add_javascript_url(u"{protocol}//ebag{cetdomain}/CetSso.js".format(protocol=self.PROTOCOL, cetdomain=self.CET_DOMAIN))
+        fragment.add_javascript_url(u"{protocol}//ebag.cet.ac.il/CetSso.js".format(protocol=self.PROTOCOL))
         fragment.add_javascript(self.resource_string("static/js/sso.js"))
 
 
@@ -88,7 +85,7 @@ class CetLoXBlock(XBlock):
         html = self.resource_string("static/html/cetlo_studio_view.html")
 
         selectedLO = dict(id=self.documentid, language=self.language, title=self.display_name)
-        html = html.format(cetdomain=self.CET_DOMAIN, selected=selectedLO)
+        html = html.format(selected=selectedLO)
         html += self.resource_string("static/html/cetlo_studio_item_template.html")
 
         frag = Fragment(html)
@@ -97,18 +94,6 @@ class CetLoXBlock(XBlock):
         frag.add_javascript(self.resource_string("static/js/services.js"))
         frag.initialize_js('CetLoXBlock')
         return frag
-
-    def get_item_url(self, documentid, language):
-        """
-        returns full url of player for a given document and language
-        """
-        return ITEM_URL_TEMPLATE.format(protocol=self.PROTOCOL, cetdomain=self.CET_DOMAIN, documentid=documentid, language=language)
-
-    def get_task_url(self, taskid):
-        """
-        returns full url of player for a given task
-        """
-        return self.TASK_URL_TEMPLATE.format(protocol=self.PROTOCOL, cetdomain=self.CET_DOMAIN, taskid=self.taskid)
 
     @XBlock.json_handler
     def studio_submit(self, data, suffix=''):

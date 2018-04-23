@@ -1,7 +1,27 @@
 ﻿/* data queries from CET for CetLoXBlock. */
 /// <reference path="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js" />
 /// <reference path="http://cdn.cet.ac.il/ui-services/login/js/cet.ui-services.login.full.js" />
-function CetServices(CetDomain) {
+function CetServices() {
+
+  this.getCetDomain = function () {
+    domainsMap = {
+      "dev": ".dev.cet.ac.il",
+      "testing": ".testing.cet.ac.il",
+      "prod": ".cet.ac.il"
+    };
+    function getEnv() {
+      var host = window.location.host.toLowerCase();
+      if (host.indexOf("localhost") >= 0 || host.indexOf("127.0.0.1") >= 0) {
+        return "dev";
+      }
+      if (host.indexOf('campus-dev.') >= 0) {
+        return "testing";
+      }
+      return "prod";
+    }
+    return domainsMap[getEnv()];
+  }
+  var CetDomain = this.CetDomain = this.getCetDomain();
 
   var PRODUCT_PLAYER = "//productplayer" + CetDomain + "/";
   var PRODUCT_PLAYER_API = "//productplayer" + CetDomain + "/api/ApiProxy/";
