@@ -7,7 +7,8 @@ function CetLoXBlock(runtime, element) {
   var _this = this;
 
   function initializeServices() {
-    _this.services = new CetServices();
+    var courseEdxName = ($(element).data('course-id') || '').split(':').pop();
+    _this.services = new CetServices(courseEdxName);
     var cetdomain = _this.services.CetDomain;
     _this.sso = new cetloAuthentication(cetdomain);
   }

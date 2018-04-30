@@ -1,7 +1,16 @@
 ﻿/* data queries from CET for CetLoXBlock. */
 /// <reference path="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js" />
 /// <reference path="http://cdn.cet.ac.il/ui-services/login/js/cet.ui-services.login.full.js" />
-function CetServices() {
+function CetServices(courseEdxName) {
+  function getCourseEdxName() {
+    var match = /-v\d+:([^\/\+]+\+[^\/\+]+\+[^\/\+]+)[\/\+]/gi.exec(location.pathname);
+    if (match.length) {
+      return match[1];
+    }
+  }
+  if (!courseEdxName) {
+    courseEdxName = getCourseEdxName();
+  }
 
   this.getCetDomain = function () {
     domainsMap = {
@@ -23,19 +32,13 @@ function CetServices() {
   }
   var CetDomain = this.CetDomain = this.getCetDomain();
 
-  var PRODUCT_PLAYER = "//productplayer" + CetDomain + "/";
-  var PRODUCT_PLAYER_API = "//productplayer" + CetDomain + "/api/ApiProxy/";
-  var PRODUCT_PLAYER_SERVICES = "//productplayerservices" + CetDomain + "/";
-  var TREE_SERVICE = "//treeservice" + CetDomain + "/api/Trees/";
-  var TREE_LMS_SERVICE = "//treeservice" + CetDomain + "/api/TreeLMS/";
+  var PRODUCT_PLAYER = "https://productplayer" + CetDomain + "/";
+  var PRODUCT_PLAYER_API = PRODUCT_PLAYER + "api/ApiProxy/";
+  var PRODUCT_PLAYER_SERVICES = "https://productplayerservices" + CetDomain + "/";
+  var TREE_SERVICE = "https://treeservice" + CetDomain + "/api/Trees/";
+  var TREE_LMS_SERVICE = "https://treeservice" + CetDomain + "/api/TreeLMS/";
   var DEFAULT_CET_COURSE = "Edx-adaptive-project";
 
-  this.getCourseEdxName = function () {
-    var match = /-v\d+:([^\/\+]+\+[^\/\+]+\+[^\/\+]+)[\/\+]/gi.exec(location.pathname);
-    if (match.length) {
-      return match[1];
-    }
-  }
 
   function getCourseCetName(edxName) {
     var url = PRODUCT_PLAYER + "edxCourses.json";
@@ -46,27 +49,24 @@ function CetServices() {
           dfd.resolve(courseObj.path);
         }
         else {
-          //dfd.reject("Cet course is not defined");
           dfd.resolve(DEFAULT_CET_COURSE);
         }
       }).fail(function (response) {
-        //dfd.reject("Failed to retrieve Cet course name. Error: " + response);
         dfd.resolve(DEFAULT_CET_COURSE);
       });
     });
   }
 
-  this.getCourseSettings = function (edxName) {
-    edxName = edxName || this.getCourseEdxName();
+  this.getCourseSettings = function () {
     return $.Deferred(function (dfd) {
-      getCourseCetName(edxName)
+      getCourseCetName(courseEdxName)
         .done(function (cetName) {
           var url = PRODUCT_PLAYER_SERVICES + "GetProductConfigurationByName/" + cetName;
 
           $.get(url)
             .done(function (response) {
               var settingsObj = {
-                edxName: edxName,
+                edxName: courseEdxName,
                 cetName: response.productName,
                 productId: response.productId,
                 folderId: response.rootDocumentId,

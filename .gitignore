@@ -1,0 +1,5 @@
+#ignore setup files
+cetloxblock/cetloxblock_xblock.egg-info/
+
+#ignore compiled files
+cetloxblock/cetloxblock/*.pyc

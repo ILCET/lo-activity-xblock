@@ -38,7 +38,8 @@ function CetLoXBlock(runtime, element) {
   }
 
   function initServices() {
-    this.services = new CetServices();
+    var courseEdxName = ($(element).data('course-id') || '').split(':').pop();
+    this.services = new CetServices(courseEdxName);
   }
 
   function renderList() {
