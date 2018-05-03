@@ -1,6 +1,7 @@
 ﻿/* data queries from CET for CetLoXBlock. */
 /// <reference path="http://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js" />
 /// <reference path="http://cdn.cet.ac.il/ui-services/login/js/cet.ui-services.login.full.js" />
+/// <reference path="env-manager.js" />
 function CetServices(courseEdxName) {
   function getCourseEdxName() {
     var match = /-v\d+:([^\/\+]+\+[^\/\+]+\+[^\/\+]+)[\/\+]/gi.exec(location.pathname);
@@ -12,25 +13,7 @@ function CetServices(courseEdxName) {
     courseEdxName = getCourseEdxName();
   }
 
-  this.getCetDomain = function () {
-    domainsMap = {
-      "dev": ".dev.cet.ac.il",
-      "testing": ".testing.cet.ac.il",
-      "prod": ".cet.ac.il"
-    };
-    function getEnv() {
-      var host = window.location.host.toLowerCase();
-      if (host.indexOf("localhost") >= 0 || host.indexOf("127.0.0.1") >= 0) {
-        return "dev";
-      }
-      if (host.indexOf('campus-dev.') >= 0) {
-        return "testing";
-      }
-      return "prod";
-    }
-    return domainsMap[getEnv()];
-  }
-  var CetDomain = this.CetDomain = this.getCetDomain();
+  var CetDomain = this.CetDomain = CetEnvManager.getCetDomain();
 
   var PRODUCT_PLAYER = "https://productplayer" + CetDomain + "/";
   var PRODUCT_PLAYER_API = PRODUCT_PLAYER + "api/ApiProxy/";
@@ -130,11 +113,12 @@ function CetServices(courseEdxName) {
       return imageUrl;
     }
 
-    function parseItemListChild(child) {
-      if (child.ParentFolder && child.ParentFolder.LeadingItem) { // Page Player
+    function parseItemListChild(child, parentFolder) {
+      if (child.ParentFolder && child.ParentFolder.LeadingItem) { // adaptive Page Player
         itemList.push({
           id: child.ParentFolder.LeadingItem.Id,
           language: rawItemList.Language,
+          folder: child.ParentFolder.Id,
           title: child.ParentFolder.LeadingItem.Title || child.ParentFolder.Title,
           imageUrl: getImageUrl(child.Children[0].ImageUrl),
         });
@@ -143,21 +127,22 @@ function CetServices(courseEdxName) {
         itemList.push({
           id: child.Id,
           language: rawItemList.Language,
+          folder: parentFolder.Id,
           title: child.Title,
           imageUrl: getImageUrl(child.ImageUrl),
         });
       }
       else {   // a folder
         for (var i = 0; i < child.Children.length; i++) {
-          parseItemListChild(child.Children[i]);
+          parseItemListChild(child.Children[i], child.ParentFolder);
         }
       }
     }
 
-    // parse list recursively
-    for (var i = 0; i < rawItemList.FolderTree.Children.length; i++) {
-      var child = rawItemList.FolderTree.Children[i];
-      parseItemListChild(child);
+    // parse list recursively (skip root LeadingItem!)
+    var root = rawItemList.FolderTree;
+    for (var i = 0; i < root.Children.length; i++) {
+      parseItemListChild(root.Children[i], root.ParentFolder);
     }
 
     return itemList;
@@ -181,7 +166,7 @@ function CetServices(courseEdxName) {
     return $.Deferred(function (dfd) {
       var urlParts = [TREE_LMS_SERVICE + "CreateTaskOnTheFly"
                     , loInfo.documentId,
-                    , courseInfo.folderId
+                    , loInfo.folderId
                     , courseInfo.productId
                     , audienceId
                     , scoreType = 0

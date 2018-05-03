@@ -32,6 +32,7 @@ class CetLoXBlock(XBlock):
 
     documentid = String(default="", scope=Scope.content, help="The LO id")
     language = String(default="he", scope=Scope.content, help="The LO language code")
+    folderid = String(default="", scope=Scope.content, help="The LO folder (scope) id for adaptive LOs")
     taskid = String(default="", scope=Scope.user_state, help="The LO id")
 
     has_author_view = True
@@ -60,22 +61,16 @@ class CetLoXBlock(XBlock):
         itemTemplate = self.ITEM_URL_TEMPLATE.format(protocol=self.PROTOCOL, cetdomain=u"{cetdomain}", language=self.language, documentid=u"{itemid}")
         taskTemplate = self.TASK_URL_TEMPLATE.format(protocol=self.PROTOCOL, cetdomain=u"{cetdomain}", taskid=u"{taskid}")
         html = self.resource_string("static/html/cetlo_student_view.html")
-        html = html.format(documentid=self.documentid, language=self.language, taskid=self.taskid, itemTemplate=itemTemplate, taskTemplate=taskTemplate, iframeSrc=iframe_src)
+        html = html.format(documentid=self.documentid, language=self.language, folderid=self.folderid, taskid=self.taskid, itemTemplate=itemTemplate, taskTemplate=taskTemplate, iframeSrc=iframe_src)
 
         frag = Fragment(html)
         frag.add_css(self.resource_string("static/css/cetloxblock_student.css"))
-        self.add_sso_scripts(frag)
+        frag.add_javascript(self.resource_string("static/js/env-manager.js"))
+        frag.add_javascript(self.resource_string("static/js/sso.js"))
         frag.add_javascript(self.resource_string("static/js/student-xblock.js"))
         frag.add_javascript(self.resource_string("static/js/services.js"))
         frag.initialize_js('CetLoXBlock')
         return frag
-
-    def add_sso_scripts(self, fragment):
-        """ add scripts required for sso with CET """
-        fragment.add_javascript_url(u"{protocol}//login.cet.ac.il/Scripts/login.js".format(protocol=self.PROTOCOL))
-        fragment.add_javascript_url(u"{protocol}//ebag.cet.ac.il/CetSso.js".format(protocol=self.PROTOCOL))
-        fragment.add_javascript(self.resource_string("static/js/sso.js"))
-
 
     def studio_view(self, context=None):
         """
@@ -84,7 +79,7 @@ class CetLoXBlock(XBlock):
         """
         html = self.resource_string("static/html/cetlo_studio_view.html")
 
-        selectedLO = dict(id=self.documentid, language=self.language, title=self.display_name)
+        selectedLO = dict(id=self.documentid, language=self.language, folderid=self.folderid, title=self.display_name)
         html = html.format(selected=selectedLO)
         html += self.resource_string("static/html/cetlo_studio_item_template.html")
 
@@ -102,6 +97,7 @@ class CetLoXBlock(XBlock):
         """
         self.documentid = data["documentid"].decode('utf8')
         self.language = data["language"].decode('utf8')
+        self.folderid = data["folderid"].decode('utf8')
         self.display_name = data["title"]
         return {'result': 'success'}
 

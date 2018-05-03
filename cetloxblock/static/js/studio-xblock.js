@@ -30,7 +30,7 @@ function CetLoXBlock(runtime, element) {
       var selected = this;
       PLUGIN_select(selected);
 
-      onItemSelection(selected.dataset.cetLoItemId, selected.dataset.cetLoItemLanguage, $('.cet-lo-item-title', selected).text());
+      onItemSelection(selected.dataset.cetLoItemId, selected.dataset.cetLoItemLanguage, selected.dataset.cetLoFolderId, $('.cet-lo-item-title', selected).text());
     });
     $('.cet-lo-item-link', element).click(function (eventObject) {
       eventObject.stopPropagation();
@@ -79,9 +79,10 @@ function CetLoXBlock(runtime, element) {
     }
   }
 
-  function onItemSelection(documentid, language, title) {
+  function onItemSelection(documentid, language, folder, title) {
     $('.cet-lo-selected-id', element).val(documentid);
     $('.cet-lo-selected-language', element).val(language);
+    $('.cet-lo-selected-folder', element).val(folder || '');
     $('.cet-lo-selected-title', element).val(title);
   }
 
@@ -93,8 +94,9 @@ function CetLoXBlock(runtime, element) {
     var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
     var data = {
       documentid: $('.cet-lo-selected-id', element).val(),
-	  language: $('.cet-lo-selected-language', element).val(),
-	  title: ($('.cet-lo-selected-title', element).val()),
+      folderid: $('.cet-lo-selected-folder', element).val(),
+      language: $('.cet-lo-selected-language', element).val(),
+	    title: ($('.cet-lo-selected-title', element).val()),
     };
     runtime.notify('save', {state: 'start'});
     $.post(handlerUrl, JSON.stringify(data)).done(function(response) {

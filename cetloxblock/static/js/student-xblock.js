@@ -17,6 +17,7 @@ function CetLoXBlock(runtime, element) {
     return {
       documentId: $('.cet-lo-document-id', element).val(),
       language: $('.cet-lo-language', element).val(),
+      folderId: $('.cet-lo-folder-id', element).val(),
     }
   }
 
