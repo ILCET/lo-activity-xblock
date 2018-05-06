@@ -86,6 +86,7 @@ class CetLoXBlock(XBlock):
         frag = Fragment(html)
         frag.add_css(self.resource_string("static/css/cetloxblock_studio.css"))
         frag.add_javascript(self.resource_string("static/js/studio-xblock.js"))
+        frag.add_javascript(self.resource_string("static/js/env-manager.js"))
         frag.add_javascript(self.resource_string("static/js/services.js"))
         frag.initialize_js('CetLoXBlock')
         return frag
