@@ -19,7 +19,7 @@
   var cetSsoUrl = 'https://ebag' + CetEnvManager.getCetDomain() + '/CetSso.js';
   var cetIdmUrl = 'https://login' + CetEnvManager.getCetDomain() + '/Scripts/login.js';
   if (CetEnvManager.getEnv() == "testing") {
-    cetIdmUrl = 'https://testing.login.cet.ac.il/login.js';
+    cetIdmUrl = cetIdmUrl.replace('login.testing','testing.login');
   }
   window.cetSsoPromise = $.when(loadScript(cetIdmUrl), loadScript(cetSsoUrl));
 })();
@@ -45,8 +45,7 @@ function cetloAuthentication(CetDomain) {
           }
           else {
             // login IDM
-            //debugger;
-            CET.Authentication.LogMeIn('IDM');
+            CET.Authentication.LogMeIn('IDM', window.location.href, window.location.href);
             dfd.resolve(false);
           }
         });
