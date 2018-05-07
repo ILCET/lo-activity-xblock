@@ -25,7 +25,7 @@ README = open(os.path.join(base_path, "README.md")).read()
 
 setup(
     name='cetloxblock-xblock',
-    version='1.0.10',
+    version='1.1.0',
     description='An XBlock that embeds the CET Player platform into Open edX. The CET player contains the ability to create personalized learning path for each student.',
     long_description=README,
     author="cetil",

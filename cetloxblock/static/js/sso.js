@@ -45,7 +45,8 @@ function cetloAuthentication(CetDomain) {
           }
           else {
             // login IDM
-            CET.Authentication.LogMeIn('IDM', window.location.href, window.location.href);
+            var returnUrl = window.location.href;
+            CET.Authentication.LogMeIn('IDM', returnUrl, returnUrl);
             dfd.resolve(false);
           }
         });
